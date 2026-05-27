@@ -1,0 +1,216 @@
+<style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #e0e5ec;
+            min-height: 100vh;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            color: #1a1a2e;
+            margin-bottom: 0.25rem;
+        }
+
+        .sub {
+            color: #666;
+            font-size: 0.85rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .search-section {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .search-section input {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-family: inherit;
+            outline: none;
+        }
+
+        .search-section input:focus {
+            border-color: #4a6fa5;
+        }
+
+        .search-section button {
+            padding: 0.75rem 1.5rem;
+            background: #4a6fa5;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .search-section button:hover {
+            background: #3a5a8a;
+        }
+
+        .current {
+            background: #f5f7fb;
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .city-name {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #1a1a2e;
+            margin-bottom: 0.5rem;
+        }
+
+        .temp {
+            font-size: 4rem;
+            font-weight: 700;
+            color: #1a1a2e;
+            margin: 0.5rem 0;
+        }
+
+        .temp span {
+            font-size: 1.5rem;
+            font-weight: 400;
+        }
+
+        .desc {
+            font-size: 1.2rem;
+            color: #555;
+            margin-bottom: 1rem;
+            text-transform: capitalize;
+        }
+
+        .details {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+
+        .detail {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #555;
+            font-size: 0.9rem;
+        }
+
+        .detail i {
+            width: 1.2rem;
+            color: #4a6fa5;
+        }
+
+        .forecast-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #1a1a2e;
+            margin-bottom: 1rem;
+        }
+
+        .forecast-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 1rem;
+        }
+
+        .forecast-card {
+            background: #f5f7fb;
+            border-radius: 12px;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .forecast-day {
+            font-weight: 600;
+            color: #1a1a2e;
+            margin-bottom: 0.5rem;
+        }
+
+        .forecast-icon {
+            font-size: 1.8rem;
+            margin: 0.5rem 0;
+            color: #4a6fa5;
+        }
+
+        .forecast-temp {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #1a1a2e;
+        }
+
+        .forecast-temp-min {
+            font-size: 0.85rem;
+            color: #888;
+            margin-left: 0.25rem;
+            font-weight: 400;
+        }
+
+        .forecast-desc {
+            font-size: 0.7rem;
+            color: #666;
+            text-transform: capitalize;
+            margin-top: 0.25rem;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #666;
+        }
+
+        .error {
+            background: #fee;
+            color: #c33;
+            padding: 0.75rem;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid #eee;
+            font-size: 0.7rem;
+            color: #888;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 1rem;
+            }
+            .temp {
+                font-size: 3rem;
+            }
+            .forecast-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+    </style>
