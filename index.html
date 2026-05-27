@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Прогноз погоды</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+</head>
+<body>
+<div class="container">
+    <h1>️ Прогноз погоды</h1>
+    <div class="sub">текущая погода и прогноз на 5 дней</div>
+
+    <div class="search-section">
+        <input type="text" id="cityInput" placeholder="Название города" value="Москва">
+        <button id="searchBtn">Поиск</button>
+    </div>
+
+    <div id="weatherContent">
+        <div class="loading">Загрузка...</div>
+    </div>
+
+    <div class="footer">
+        Данные: Open-Meteo
+    </div>
+    </div>
+
+    <div class="footer">
+        Автор: Иван Дубина
+    </div>
+</div>
+
+<script>
+    function getWeatherInfo(code) {
+        const map = {
+            0: { desc: "Ясно", icon: "fa-sun" },
+            1: { desc: "Малооблачно", icon: "fa-cloud-sun" },
+            2: { desc: "Переменная облачность", icon: "fa-cloud-sun" },
+            3: { desc: "Пасмурно", icon: "fa-cloud" },
+            45: { desc: "Туман", icon: "fa-smog" },
+            51: { desc: "Морось", icon: "fa-cloud-rain" },
+            53: { desc: "Морось", icon: "fa-cloud-rain" },
+            55: { desc: "Морось", icon: "fa-cloud-rain" },
+            61: { desc: "Дождь", icon: "fa-cloud-rain" },
+            63: { desc: "Дождь", icon: "fa-cloud-rain" },
+            65: { desc: "Дождь", icon: "fa-cloud-showers-heavy" },
+            71: { desc: "Снег", icon: "fa-snowflake" },
+            73: { desc: "Снег", icon: "fa-snowflake" },
+            75: { desc: "Снег", icon: "fa-snowflake" },
+            80: { desc: "Ливень", icon: "fa-cloud-showers-heavy" },
+            95: { desc: "Гроза", icon: "fa-bolt" }
+        };
+        return map[code] || { desc: "Облачно", icon: "fa-cloud" };
+    }
+
+    function formatDay(dateStr) {
+        const days = ['ВС', 'ПН', 'ВТ', 'СР', 'ЧТ', 'ПТ', 'СБ'];
+        const date = new Date(dateStr);
+        return `${days[date.getDay()]} ${date.getDate()}`;
+    }
+
+    async function getWeather(city) {
+        const content = document.getElementById('weatherContent');
+        content.innerHTML = '<div class="loading">Загрузка...</div>';
+
+        try {
+            const geoRes = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(city)}&format=json&limit=1`);
+            const geoData = await geoRes.json();
+            if (!geoData.length) throw new Error('Город не найден');
+
+            const lat = geoData[0].lat;
+            const lon = geoData[0].lon;
+            const cityName = geoData[0].display_name.split(',')[0];
+
+            const weatherRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&daily=weathercode,temperature_2m_max,temperature_2m_min&timezone=auto&forecast_days=6`);
+            const data = await weatherRes.json();
+
+            const current = data.current_weather;
+            const daily = data.daily;
+            const wInfo = getWeatherInfo(current.weathercode);
+            const temp = Math.round(current.temperature);
+            const windDir = current.winddirection;
+            const dirs = ['С', 'СВ', 'В', 'ЮВ', 'Ю', 'ЮЗ', 'З', 'СЗ'];
+            const windText = dirs[Math.round(windDir / 45) % 8] || '?';
+
+            let forecastHtml = '';
+            for (let i = 1; i <= 5 && i < daily.time.length; i++) {
+                const fInfo = getWeatherInfo(daily.weathercode[i]);
+                forecastHtml += `
+                    <div class="forecast-card">
+                        <div class="forecast-day">${formatDay(daily.time[i])}</div>
+                        <div class="forecast-icon"><i class="fas ${fInfo.icon}"></i></div>
+                        <div class="forecast-temp">${Math.round(daily.temperature_2m_max[i])}°<span class="forecast-temp-min">/${Math.round(daily.temperature_2m_min[i])}°</span></div>
+                        <div class="forecast-desc">${fInfo.desc}</div>
+                    </div>
+                `;
+            }
+
+            content.innerHTML = `
+                <div class="current">
+                    <div class="city-name">${cityName}</div>
+                    <div class="temp">${temp}°<span>C</span></div>
+                    <div class="desc"><i class="fas ${wInfo.icon}"></i> ${wInfo.desc}</div>
+                    <div class="details">
+                        <div class="detail"><i class="fas fa-wind"></i> Ветер: ${current.windspeed} м/с, ${windText}</div>
+                        <div class="detail"><i class="fas fa-calendar"></i> ${new Date().toLocaleDateString('ru-RU')}</div>
+                    </div>
+                </div>
+                <div class="forecast-title"> Прогноз на 5 дней</div>
+                <div class="forecast-grid">${forecastHtml}</div>
+            `;
+        } catch (err) {
+            content.innerHTML = `<div class="error">❌ ${err.message}</div>`;
+        }
+    }
+
+    const input = document.getElementById('cityInput');
+    const btn = document.getElementById('searchBtn');
+
+    btn.addEventListener('click', () => getWeather(input.value.trim() || 'Москва'));
+    input.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') getWeather(input.value.trim() || 'Москва');
+    });
+
+    getWeather('Москва');
+</script>
+</body>
+</html>
